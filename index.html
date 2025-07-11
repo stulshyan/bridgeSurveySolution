@@ -3,26 +3,64 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Project Landing</title>
+  <title>Bridge Survey Solution</title>
   <style>
-      body {font-family: system-ui, sans-serif; margin:0; display:flex; height:100vh; align-items:center; justify-content:center; background:#f5f7fa;}
-      .container {display:grid; gap:2rem; grid-template-columns: repeat(auto-fit, minmax(250px,1fr)); width:90%; max-width:800px;}
-      .card {background:white; border-radius:1rem; box-shadow:0 4px 12px rgba(0,0,0,.05); padding:3rem 2rem; text-align:center; text-decoration:none; color:#111; transition:transform .2s, box-shadow .2s;}
-      .card:hover {transform:translateY(-4px); box-shadow:0 6px 16px rgba(0,0,0,.08);}
-      .card h2 {margin:0 0 .5rem; font-size:1.5rem;}
-      .card p {margin:0; color:#555;}
+      :root {
+          --bg: #f5f7fa;
+          --card-bg: #ffffff;
+          --card-hover: #f0f4ff;
+          --accent: #0066ff;
+      }
+      * {box-sizing:border-box; margin:0; padding:0;}
+      body {
+          font-family: system-ui, sans-serif;
+          background: var(--bg);
+          display:flex;
+          align-items:center;
+          justify-content:center;
+          height:100vh;
+      }
+      .container {
+          display:grid;
+          gap:2rem;
+          grid-template-columns: repeat(auto-fit,minmax(260px,1fr));
+          width:min(800px,90%);
+      }
+      .card {
+          background: var(--card-bg);
+          border-radius: 1rem;
+          padding: 2.5rem 1.5rem;
+          text-align:center;
+          box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+          transition: all 0.25s ease;
+          text-decoration:none;
+          color: inherit;
+      }
+      .card:hover {
+          transform: translateY(-6px);
+          background: var(--card-hover);
+          box-shadow: 0 10px 24px rgba(0,0,0,0.08);
+      }
+      .card h2 {
+          font-size: 1.4rem;
+          margin-bottom: 0.5rem;
+      }
+      .card p {color:#555; font-size:0.95rem;}
   </style>
 </head>
 <body>
   <main class="container">
-    <a class="card" href="./admin/">
+    <!-- Update the href values below to match the exact filenames in your repo -->
+    <a class="card" href="bridge_inspection_admin.html">
       <h2>Admin Portal</h2>
-      <p>Manage data &amp; settings</p>
+      <p>Manage inspections, users &amp; reports</p>
     </a>
-    <a class="card" href="./surveyor/">
+
+    <a class="card" href="bridge_inspection_mobile.html">
       <h2>Surveyor App</h2>
-      <p>Field data collection</p>
+      <p>Log bridge data in the field</p>
     </a>
   </main>
 </body>
 </html>
+
