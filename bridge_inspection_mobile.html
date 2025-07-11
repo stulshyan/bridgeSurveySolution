@@ -1,0 +1,2248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Bridge Safety Officer Mobile App</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f0f2f5;
+            color: #1a1a1a;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .phone-container {
+            max-width: 390px;
+            margin: 20px auto;
+            background: #000;
+            border-radius: 40px;
+            padding: 12px;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
+        }
+
+        .phone-screen {
+            background: #fff;
+            border-radius: 30px;
+            overflow: hidden;
+            height: 844px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .status-bar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 14px 24px 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .app-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 24px;
+            position: relative;
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .back-button {
+            position: absolute;
+            left: 20px;
+            top: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            cursor: pointer;
+            display: none;
+            backdrop-filter: blur(10px);
+        }
+
+        .back-button.visible {
+            display: block;
+        }
+
+        .app-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .app-subtitle {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .profile-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 12px 16px;
+            border-radius: 16px;
+            margin-top: 16px;
+            backdrop-filter: blur(10px);
+        }
+
+        .profile-avatar {
+            width: 48px;
+            height: 48px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        .profile-info {
+            flex: 1;
+        }
+
+        .profile-name {
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .profile-role {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            flex: 1;
+            overflow-y: auto;
+            background: #f8f9fa;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .view {
+            display: none;
+            min-height: 100%;
+        }
+
+        .view.active {
+            display: block;
+        }
+
+        /* Dashboard Styles */
+        .dashboard-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            padding: 16px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            transition: transform 0.2s ease;
+        }
+
+        .stat-card:active {
+            transform: scale(0.98);
+        }
+
+        .stat-number {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 4px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        .week-selector {
+            background: white;
+            padding: 16px;
+            margin: 0 16px 16px;
+            border-radius: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .week-nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .week-nav button {
+            background: #f0f2f5;
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            font-size: 18px;
+            color: #667eea;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .week-nav button:active {
+            background: #667eea;
+            color: white;
+        }
+
+        .current-week {
+            font-weight: 600;
+            font-size: 16px;
+            color: #1a1a1a;
+        }
+
+        .progress-overview {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .progress-bar {
+            flex: 1;
+            height: 8px;
+            background: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .progress-text {
+            font-size: 14px;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        /* Assignment List */
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1a1a1a;
+            padding: 16px 16px 8px;
+        }
+
+        .assignment-list {
+            padding: 0 16px 100px;
+        }
+
+        .assignment-card {
+            background: white;
+            border-radius: 16px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            transition: transform 0.2s ease;
+        }
+
+        .assignment-card:active {
+            transform: scale(0.98);
+        }
+
+        .assignment-header {
+            padding: 16px;
+            border-bottom: 1px solid #f0f2f5;
+        }
+
+        .bridge-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 4px;
+        }
+
+        .bridge-details {
+            font-size: 14px;
+            color: #64748b;
+            margin-bottom: 12px;
+        }
+
+        .assignment-meta {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            color: #495057;
+        }
+
+        .meta-icon {
+            font-size: 16px;
+        }
+
+        .health-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .health-excellent { background: #10b981; }
+        .health-good { background: #22c55e; }
+        .health-fair { background: #f59e0b; }
+        .health-poor { background: #ef4444; }
+        .health-critical { background: #dc2626; }
+
+        .assignment-actions {
+            padding: 12px 16px;
+            background: #f8f9fa;
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn:active {
+            transform: scale(0.95);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #e9ecef;
+            color: #495057;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: white;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+        }
+
+        .status-badge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .status-pending { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
+        .status-overdue { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
+        .status-completed { background: rgba(34, 197, 94, 0.1); color: #22c55e; }
+        .status-in-progress { background: rgba(251, 191, 36, 0.1); color: #f59e0b; }
+
+        /* Survey Form Styles */
+        .survey-header {
+            background: white;
+            margin: 16px;
+            border-radius: 16px;
+            padding: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .gps-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px;
+            background: rgba(34, 197, 94, 0.1);
+            border-radius: 12px;
+            margin-top: 12px;
+        }
+
+        .gps-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #22c55e;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        .gps-text {
+            font-size: 13px;
+            color: #059669;
+            font-weight: 500;
+        }
+
+        .form-progress {
+            background: white;
+            margin: 16px;
+            padding: 16px;
+            border-radius: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .form-tabs {
+            display: flex;
+            gap: 8px;
+            padding: 4px;
+            background: #f0f2f5;
+            border-radius: 12px;
+            margin-bottom: 12px;
+        }
+
+        .form-tab {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            background: transparent;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #64748b;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .form-tab.active {
+            background: white;
+            color: #667eea;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-tab.completed {
+            color: #22c55e;
+        }
+
+        .form-section {
+            display: none;
+            padding: 0 16px 20px;
+        }
+
+        .form-section.active {
+            display: block;
+        }
+
+        .section-card {
+            background: white;
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #f0f2f5;
+        }
+
+        .section-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: white;
+        }
+
+        .section-title-text {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 600;
+            color: #374151;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .required {
+            color: #ef4444;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #667eea;
+            background: #f8f9ff;
+        }
+
+        textarea.form-input {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .radio-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+            gap: 8px;
+        }
+
+        .radio-option {
+            position: relative;
+        }
+
+        .radio-input {
+            display: none;
+        }
+
+        .radio-label {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 12px 8px;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            text-align: center;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: white;
+        }
+
+        .radio-label:active {
+            transform: scale(0.95);
+        }
+
+        .radio-input:checked + .radio-label {
+            border-color: #667eea;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .radio-score {
+            font-size: 10px;
+            opacity: 0.8;
+            margin-top: 2px;
+        }
+
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: white;
+        }
+
+        .checkbox-item:active {
+            transform: scale(0.98);
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .checkbox-item input:checked + label {
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .checkbox-item input:checked ~ .checkbox-item {
+            border-color: #667eea;
+            background: #f8f9ff;
+        }
+
+        .image-capture-area {
+            border: 2px dashed #cbd5e1;
+            border-radius: 16px;
+            padding: 24px;
+            text-align: center;
+            background: #f8f9fa;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .image-capture-area:active {
+            transform: scale(0.98);
+            background: #e9ecef;
+        }
+
+        .capture-icon {
+            font-size: 40px;
+            margin-bottom: 8px;
+            color: #667eea;
+        }
+
+        .capture-text {
+            font-size: 16px;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 4px;
+        }
+
+        .capture-hint {
+            font-size: 13px;
+            color: #64748b;
+        }
+
+        .captured-images {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .captured-image {
+            position: relative;
+            aspect-ratio: 1;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #e9ecef;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: #64748b;
+        }
+
+        .remove-image {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            background: rgba(239, 68, 68, 0.9);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .photo-requirements {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+            padding: 8px 12px;
+            background: #fef3c7;
+            border-radius: 8px;
+        }
+
+        .requirement-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #f59e0b;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .requirement-icon.completed {
+            background: #22c55e;
+        }
+
+        .requirement-text {
+            font-size: 13px;
+            color: #92400e;
+            font-weight: 500;
+        }
+
+        /* Signature Pad */
+        .signature-pad {
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            background: white;
+            cursor: crosshair;
+            margin-bottom: 8px;
+        }
+
+        .signature-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 390px;
+            background: white;
+            border-top: 1px solid #e9ecef;
+            display: flex;
+            padding: 8px 0;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .nav-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 8px;
+            color: #64748b;
+            text-decoration: none;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+
+        .nav-item.active {
+            color: #667eea;
+        }
+
+        .nav-icon {
+            font-size: 24px;
+            margin-bottom: 4px;
+        }
+
+        /* History View */
+        .filter-pills {
+            display: flex;
+            gap: 8px;
+            padding: 16px;
+            overflow-x: auto;
+        }
+
+        .filter-pill {
+            padding: 8px 16px;
+            border: 2px solid #e9ecef;
+            border-radius: 20px;
+            background: white;
+            font-size: 13px;
+            font-weight: 600;
+            color: #64748b;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .filter-pill.active {
+            border-color: #667eea;
+            background: #667eea;
+            color: white;
+        }
+
+        .history-list {
+            padding: 0 16px 100px;
+        }
+
+        .history-item {
+            background: white;
+            border-radius: 16px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+        }
+
+        .history-header {
+            padding: 16px;
+            border-bottom: 1px solid #f0f2f5;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .history-date {
+            font-size: 13px;
+            color: #64748b;
+        }
+
+        .history-details {
+            padding: 16px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .detail-item {
+            font-size: 13px;
+        }
+
+        .detail-label {
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        .detail-value {
+            color: #1a1a1a;
+            font-weight: 600;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #64748b;
+        }
+
+        .empty-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .empty-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .empty-text {
+            font-size: 14px;
+        }
+
+        /* Notification */
+        .notification {
+            background: #fef3c7;
+            border: 1px solid #fcd34d;
+            padding: 12px 16px;
+            margin: 16px;
+            border-radius: 12px;
+            font-size: 14px;
+            color: #92400e;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .notification-icon {
+            font-size: 20px;
+        }
+
+        /* Loading State */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid #e9ecef;
+            border-top-color: #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Submit Section */
+        .submit-section {
+            background: white;
+            margin: 16px;
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .submit-checklist {
+            margin-bottom: 20px;
+        }
+
+        .checklist-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 0;
+            font-size: 14px;
+        }
+
+        .checklist-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #e9ecef;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+
+        .checklist-icon.completed {
+            background: #22c55e;
+            color: white;
+        }
+
+        /* Responsive */
+        @media (max-width: 390px) {
+            .phone-container {
+                margin: 0;
+                border-radius: 0;
+                padding: 0;
+            }
+
+            .phone-screen {
+                border-radius: 0;
+                height: 100vh;
+            }
+
+            .bottom-nav {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="phone-container">
+        <div class="phone-screen">
+            <!-- Status Bar -->
+            <div class="status-bar">
+                <span id="currentTime">9:41 AM</span>
+                <span>📶 🔋 85%</span>
+            </div>
+
+            <!-- App Header -->
+            <div class="app-header">
+                <button class="back-button" id="backBtn" onclick="goBack()">← Back</button>
+                <div class="header-content">
+                    <div>
+                        <div class="app-title" id="headerTitle">Bridge Safety Officer</div>
+                        <div class="app-subtitle" id="headerSubtitle">State Road Construction Department</div>
+                    </div>
+                </div>
+                <div class="profile-section">
+                    <div class="profile-avatar">RK</div>
+                    <div class="profile-info">
+                        <div class="profile-name">Rajesh Kumar</div>
+                        <div class="profile-role">Safety Officer • Northern Division</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="main-content">
+                <!-- Dashboard View -->
+                <div class="view active" id="dashboard">
+                    <!-- Dashboard Stats -->
+                    <div class="dashboard-stats">
+                        <div class="stat-card" onclick="showAssignments()">
+                            <div class="stat-number">12</div>
+                            <div class="stat-label">Assigned This Week</div>
+                        </div>
+                        <div class="stat-card" onclick="filterAssignments('completed')">
+                            <div class="stat-number">8</div>
+                            <div class="stat-label">Completed</div>
+                        </div>
+                        <div class="stat-card" onclick="filterAssignments('pending')">
+                            <div class="stat-number">3</div>
+                            <div class="stat-label">Pending</div>
+                        </div>
+                        <div class="stat-card" onclick="filterAssignments('overdue')">
+                            <div class="stat-number">1</div>
+                            <div class="stat-label">Overdue</div>
+                        </div>
+                    </div>
+
+                    <!-- Week Selector -->
+                    <div class="week-selector">
+                        <div class="week-nav">
+                            <button onclick="changeWeek(-1)">‹</button>
+                            <div class="current-week" id="currentWeek">Week of Jan 13-19, 2025</div>
+                            <button onclick="changeWeek(1)">›</button>
+                        </div>
+                        <div class="progress-overview">
+                            <span class="progress-text">Progress:</span>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="weekProgress" style="width: 67%"></div>
+                            </div>
+                            <span class="progress-text" id="progressText">8/12</span>
+                        </div>
+                    </div>
+
+                    <!-- Notifications -->
+                    <div class="notification" id="overdueNotice">
+                        <span class="notification-icon">⚠️</span>
+                        <span>1 inspection is overdue. Please complete immediately.</span>
+                    </div>
+
+                    <!-- Assignment List -->
+                    <div class="section-title">This Week's Assignments</div>
+                    <div class="assignment-list">
+                        <div class="assignment-card" onclick="selectBridge('BRG-001')">
+                            <div class="assignment-header">
+                                <div class="bridge-name">NH-44 Highway Bridge</div>
+                                <div class="bridge-details">BRG-001 • Highway Bridge • Length: 450m • Built: 2018</div>
+                                <div class="assignment-meta">
+                                    <div class="meta-item">
+                                        <span class="meta-icon">📅</span>
+                                        <span>Due: Jan 15, 2025</span>
+                                    </div>
+                                    <div class="meta-item">
+                                        <span class="meta-icon">🔄</span>
+                                        <span>Monthly Inspection</span>
+                                    </div>
+                                    <div class="meta-item">
+                                        <span class="meta-icon">📍</span>
+                                        <span>2.3 km away</span>
+                                    </div>
+                                    <div class="meta-item">
+                                        <div class="health-indicator health-good"></div>
+                                        <span>Last: Good (78%)</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="assignment-actions">
+                                <button class="btn btn-primary" onclick="startSurvey('BRG-001')">
+                                    📋 Start Inspection
+                                </button>
+                                <button class="btn btn-secondary" onclick="viewHistory('BRG-001')">
+                                    📊 History
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="assignment-card">
+                            <div class="assignment-header">
+                                <div class="bridge-name">Express Highway Flyover</div>
+                                <div class="bridge-details">BRG-002 • Expressway Bridge • Length: 680m • Built: 2021</div>
+                                <div class="assignment-meta">
+                                    <div class="meta-item">
+                                        <span class="meta-icon">📅</span>
+                                        <span>Due: Jan 16, 2025</span>
+                                    </div>
+                                    <div class="meta-item">
+                                        <span class="meta-icon">🔄</span>
+                                        <span>Weekly Inspection</span>
+                                    </div>
+                                    <div class="meta-item">
+                                        <span class="meta-icon">📍</span>
+                                        <span>5.1 km away</span>
+                                    </div>
+                                    <div class="meta-item">
+                                        <div class="health-indicator health-excellent"></div>
+                                        <span>Last: Excellent (94%)</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="assignment-actions">
+                                <button class="btn btn-primary" onclick="startSurvey('BRG-002')">
+                                    📋 Start Inspection
+                                </button>
+                                <button class="btn btn-secondary" onclick="viewHistory('BRG-002')">
+                                    📊 History
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="assignment-card">
+                            <div class="assignment-header">
+                                <div class="bridge-name">Rural Access Bridge</div>
+                                <div class="bridge-details">BRG-004 • Rural Bridge • Length: 180m • Built: 2012</div>
+                                <div class="assignment-meta">
+                                    <div class="meta-item">
+                                        <span class="meta-icon">📅</span>
+                                        <span style="color: #ef4444;">Due: Jan 12, 2025</span>
+                                        <span class="status-badge status-overdue">Overdue</span>
+                                    </div>
+                                    <div class="meta-item">
+                                        <span class="meta-icon">🔄</span>
+                                        <span>Quarterly Inspection</span>
+                                    </div>
+                                    <div class="meta-item">
+                                        <span class="meta-icon">📍</span>
+                                        <span>8.7 km away</span>
+                                    </div>
+                                    <div class="meta-item">
+                                        <div class="health-indicator health-poor"></div>
+                                        <span>Last: Poor (42%)</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="assignment-actions">
+                                <button class="btn btn-danger" onclick="startSurvey('BRG-004')">
+                                    🚨 Urgent Inspection
+                                </button>
+                                <button class="btn btn-secondary" onclick="viewHistory('BRG-004')">
+                                    📊 History
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="assignment-card">
+                            <div class="assignment-header">
+                                <div class="bridge-name">City Center Flyover</div>
+                                <div class="bridge-details">BRG-003 • City Flyover • Length: 320m • Built: 2016</div>
+                                <div class="assignment-meta">
+                                    <div class="meta-item">
+                                        <span class="meta-icon">📅</span>
+                                        <span>Due: Jan 18, 2025</span>
+                                    </div>
+                                    <div class="meta-item">
+                                        <span class="meta-icon">🔄</span>
+                                        <span>Monthly Inspection</span>
+                                    </div>
+                                    <div class="meta-item">
+                                        <span class="meta-icon">📍</span>
+                                        <span>3.4 km away</span>
+                                    </div>
+                                    <div class="meta-item">
+                                        <div class="health-indicator health-fair"></div>
+                                        <span>Last: Fair (71%)</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="assignment-actions">
+                                <button class="btn btn-primary" onclick="startSurvey('BRG-003')">
+                                    📋 Start Inspection
+                                </button>
+                                <button class="btn btn-secondary" onclick="viewHistory('BRG-003')">
+                                    📊 History
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Survey Form View -->
+                <div class="view" id="survey">
+                    <!-- Survey Header -->
+                    <div class="survey-header">
+                        <div class="bridge-name" id="surveyBridgeName">NH-44 Highway Bridge</div>
+                        <div class="bridge-details" id="surveyBridgeDetails">BRG-001 • Highway Bridge • Length: 450m</div>
+                        <div class="gps-status">
+                            <div class="gps-indicator"></div>
+                            <span class="gps-text">GPS Verified • 28.6139°N, 77.2090°E • Accuracy: ±3m</span>
+                        </div>
+                    </div>
+
+                    <!-- Form Progress -->
+                    <div class="form-progress">
+                        <div class="form-tabs">
+                            <button class="form-tab active" onclick="showFormSection('structural')" id="tab-structural">
+                                Structural
+                            </button>
+                            <button class="form-tab" onclick="showFormSection('safety')" id="tab-safety">
+                                Safety
+                            </button>
+                            <button class="form-tab" onclick="showFormSection('surface')" id="tab-surface">
+                                Surface
+                            </button>
+                            <button class="form-tab" onclick="showFormSection('environment')" id="tab-environment">
+                                Environment
+                            </button>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="formProgress" style="width: 0%"></div>
+                        </div>
+                    </div>
+
+                    <!-- Structural Assessment Section -->
+                    <div class="form-section active" id="structural">
+                        <div class="section-card">
+                            <div class="section-header">
+                                <div class="section-icon">🏗️</div>
+                                <div class="section-title-text">Structural Assessment</div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Overall Structural Condition <span class="required">*</span></label>
+                                <div class="radio-group">
+                                    <div class="radio-option">
+                                        <input type="radio" id="struct_excellent" name="structural_condition" value="excellent" class="radio-input" onchange="updateProgress()">
+                                        <label for="struct_excellent" class="radio-label">
+                                            Excellent
+                                            <span class="radio-score">90-100</span>
+                                        </label>
+                                    </div>
+                                    <div class="radio-option">
+                                        <input type="radio" id="struct_good" name="structural_condition" value="good" class="radio-input" onchange="updateProgress()">
+                                        <label for="struct_good" class="radio-label">
+                                            Good
+                                            <span class="radio-score">75-89</span>
+                                        </label>
+                                    </div>
+                                    <div class="radio-option">
+                                        <input type="radio" id="struct_fair" name="structural_condition" value="fair" class="radio-input" onchange="updateProgress()">
+                                        <label for="struct_fair" class="radio-label">
+                                            Fair
+                                            <span class="radio-score">60-74</span>
+                                        </label>
+                                    </div>
+                                    <div class="radio-option">
+                                        <input type="radio" id="struct_poor" name="structural_condition" value="poor" class="radio-input" onchange="updateProgress()">
+                                        <label for="struct_poor" class="radio-label">
+                                            Poor
+                                            <span class="radio-score">40-59</span>
+                                        </label>
+                                    </div>
+                                    <div class="radio-option">
+                                        <input type="radio" id="struct_critical" name="structural_condition" value="critical" class="radio-input" onchange="updateProgress()">
+                                        <label for="struct_critical" class="radio-label">
+                                            Critical
+                                            <span class="radio-score">&lt;40</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Structural Issues Observed</label>
+                                <div class="checkbox-group">
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" id="cracks" name="structural_issues" value="cracks">
+                                        <label for="cracks">Visible cracks in concrete/steel</label>
+                                    </div>
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" id="corrosion" name="structural_issues" value="corrosion">
+                                        <label for="corrosion">Steel corrosion or rust</label>
+                                    </div>
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" id="spalling" name="structural_issues" value="spalling">
+                                        <label for="spalling">Concrete spalling</label>
+                                    </div>
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" id="displacement" name="structural_issues" value="displacement">
+                                        <label for="displacement">Structural displacement</label>
+                                    </div>
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" id="deformation" name="structural_issues" value="deformation">
+                                        <label for="deformation">Beam/girder deformation</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Load-bearing Components</label>
+                                <div class="radio-group">
+                                    <div class="radio-option">
+                                        <input type="radio" id="load_excellent" name="load_bearing" value="excellent" class="radio-input">
+                                        <label for="load_excellent" class="radio-label">Excellent</label>
+                                    </div>
+                                    <div class="radio-option">
+                                        <input type="radio" id="load_good" name="load_bearing" value="good" class="radio-input">
+                                        <label for="load_good" class="radio-label">Good</label>
+                                    </div>
+                                    <div class="radio-option">
+                                        <input type="radio" id="load_fair" name="load_bearing" value="fair" class="radio-input">
+                                        <label for="load_fair" class="radio-label">Fair</label>
+                                    </div>
+                                    <div class="radio-option">
+                                        <input type="radio" id="load_poor" name="load_bearing" value="poor" class="radio-input">
+                                        <label for="load_poor" class="radio-label">Poor</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Structural Photos <span class="required">*</span></label>
+                                <div class="photo-requirements">
+                                    <div class="requirement-icon" id="struct-photo-icon">4</div>
+                                    <span class="requirement-text">Minimum 4 photos required (overall structure from different angles)</span>
+                                </div>
+                                <div class="image-capture-area" onclick="captureImage('structural')">
+                                    <div class="capture-icon">📷</div>
+                                    <div class="capture-text">Capture Structural Photos</div>
+                                    <div class="capture-hint">Tap to take photos of the bridge structure</div>
+                                </div>
+                                <div class="captured-images" id="structural-images"></div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Crack Width Measurement (if applicable)</label>
+                                <input type="number" class="form-input" placeholder="Enter maximum crack width in mm" step="0.1">
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Structural Notes</label>
+                                <textarea class="form-input" placeholder="Detailed observations about structural condition..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Safety Features Section -->
+                    <div class="form-section" id="safety">
+                        <div class="section-card">
+                            <div class="section-header">
+                                <div class="section-icon">🛡️</div>
+                                <div class="section-title-text">Safety Features</div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Guard Rails/Barriers <span class="required">*</span></label>
+                                <div class="radio-group">
+                                    <div class="radio-option">
+                                        <input type="radio" id="guard_excellent" name="guard_rails" value="excellent" class="radio-input" onchange="updateProgress()">
+                                        <label for="guard_excellent" class="radio-label">Excellent</label>
+                                    </div>
+                                    <div class="radio-option">
+                                        <input type="radio" id="guard_good" name="guard_rails" value="good" class="radio-input" onchange="updateProgress()">
+                                        <label for="guard_good" class="radio-label">Good</label>
+                                    </div>
+                                    <div class="radio-option">
+                                        <input type="radio" id="guard_fair" name="guard_rails" value="fair" class="radio-input" onchange="updateProgress()">
+                                        <label for="guard_fair" class="radio-label">Fair</label>
+                                    </div>
+                                    <div class="radio-option">
+                                        <input type="radio" id="guard_poor" name="guard_rails" value="poor" class="radio-input" onchange="updateProgress()">
+                                        <label for="guard_poor" class="radio-label">Poor</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Safety Features Status</label>
+                                <div class="checkbox-group">
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" id="lighting" name="safety_features" value="lighting">
+                                        <label for="lighting">Street lighting functional</label>
+                                    </div>
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" id="signs" name="safety_features" value="signs">
+                                        <label for="signs">Warning signs clearly visible</label>
+                                    </div>
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" id="reflectors" name="safety_features" value="reflectors">
+                                        <label for="reflectors">Reflectors/markers in place</label>
+                                    </div>
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" id="emergency" name="safety_features" value="emergency">
+                                        <label for="emergency">Emergency access available</label>
+                                    </div>
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" id="pedestrian" name="safety_features" value="pedestrian">
+                                        <label for="pedestrian">Pedestrian walkway safe</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Safety Photos <span class="required">*</span></label>
+                                <div class="photo-requirements">
+                                    <div class="requirement-icon" id="safety-photo-icon">3</div>
+                                    <span class="requirement-text">Minimum 3 photos (guard rails, signs, lighting)</span>
+                                </div>
+                                <div class="image-capture-area" onclick="captureImage('safety')">
+                                    <div class="capture-icon">📷</div>
+                                    <div class="capture-text">Capture Safety Features</div>
+                                    <div class="capture-hint">Photos of barriers, signs, and safety equipment</div>
+                                </div>
+                                <div class="captured-images" id="safety-images"></div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Safety Concerns</label>
+                                <textarea class="form-input" placeholder="Note any safety hazards or concerns..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Surface Condition Section -->
+                    <div class="form-section" id="surface">
+                        <div class="section-card">
+                            <div class="section-header">
+                                <div class="section-icon">🛣️</div>
+                                <div class="section-title-text">Surface & Maintenance</div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Road Surface Condition <span class="required">*</span></label>
+                                <div class="radio-group">
+                                    <div class="radio-option">
+                                        <input type="radio" id="surface_excellent" name="surface_condition" value="excellent" class="radio-input" onchange="updateProgress()">
+                                        <label for="surface_excellent" class="radio-label">Excellent</label>
+                                    </div>
+                                    <div class="radio-option">
+                                        <input type="radio" id="surface_good" name="surface_condition" value="good" class="radio-input" onchange="updateProgress()">
+                                        <label for="surface_good" class="radio-label">Good</label>
+                                    </div>
+                                    <div class="radio-option">
+                                        <input type="radio" id="surface_fair" name="surface_condition" value="fair" class="radio-input" onchange="updateProgress()">
+                                        <label for="surface_fair" class="radio-label">Fair</label>
+                                    </div>
+                                    <div class="radio-option">
+                                        <input type="radio" id="surface_poor" name="surface_condition" value="poor" class="radio-input" onchange="updateProgress()">
+                                        <label for="surface_poor" class="radio-label">Poor</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Surface Issues</label>
+                                <div class="checkbox-group">
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" id="potholes" name="surface_issues" value="potholes">
+                                        <label for="potholes">Potholes present</label>
+                                    </div>
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" id="rutting" name="surface_issues" value="rutting">
+                                        <label for="rutting">Rutting or depressions</label>
+                                    </div>
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" id="surface_cracks" name="surface_issues" value="cracks">
+                                        <label for="surface_cracks">Surface cracking</label>
+                                    </div>
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" id="water_pooling" name="surface_issues" value="water">
+                                        <label for="water_pooling">Water pooling/drainage issues</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Drainage System</label>
+                                <div class="radio-group">
+                                    <div class="radio-option">
+                                        <input type="radio" id="drain_clear" name="drainage" value="clear" class="radio-input">
+                                        <label for="drain_clear" class="radio-label">Clear</label>
+                                    </div>
+                                    <div class="radio-option">
+                                        <input type="radio" id="drain_partial" name="drainage" value="partial" class="radio-input">
+                                        <label for="drain_partial" class="radio-label">Partial</label>
+                                    </div>
+                                    <div class="radio-option">
+                                        <input type="radio" id="drain_blocked" name="drainage" value="blocked" class="radio-input">
+                                        <label for="drain_blocked" class="radio-label">Blocked</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Surface Photos <span class="required">*</span></label>
+                                <div class="photo-requirements">
+                                    <div class="requirement-icon" id="surface-photo-icon">4</div>
+                                    <span class="requirement-text">Minimum 4 photos (surface condition, defects)</span>
+                                </div>
+                                <div class="image-capture-area" onclick="captureImage('surface')">
+                                    <div class="capture-icon">📷</div>
+                                    <div class="capture-text">Capture Surface Photos</div>
+                                    <div class="capture-hint">Include any potholes, cracks, or damage</div>
+                                </div>
+                                <div class="captured-images" id="surface-images"></div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Maintenance Priority</label>
+                                <div class="radio-group">
+                                    <div class="radio-option">
+                                        <input type="radio" id="maint_routine" name="maintenance" value="routine" class="radio-input">
+                                        <label for="maint_routine" class="radio-label">Routine</label>
+                                    </div>
+                                    <div class="radio-option">
+                                        <input type="radio" id="maint_minor" name="maintenance" value="minor" class="radio-input">
+                                        <label for="maint_minor" class="radio-label">Minor</label>
+                                    </div>
+                                    <div class="radio-option">
+                                        <input type="radio" id="maint_major" name="maintenance" value="major" class="radio-input">
+                                        <label for="maint_major" class="radio-label">Major</label>
+                                    </div>
+                                    <div class="radio-option">
+                                        <input type="radio" id="maint_urgent" name="maintenance" value="urgent" class="radio-input">
+                                        <label for="maint_urgent" class="radio-label">Urgent</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Environmental Section -->
+                    <div class="form-section" id="environment">
+                        <div class="section-card">
+                            <div class="section-header">
+                                <div class="section-icon">🌿</div>
+                                <div class="section-title-text">Environmental & Final Assessment</div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Weather Conditions <span class="required">*</span></label>
+                                <div class="radio-group">
+                                    <div class="radio-option">
+                                        <input type="radio" id="weather_clear" name="weather" value="clear" class="radio-input" onchange="updateProgress()">
+                                        <label for="weather_clear" class="radio-label">Clear</label>
+                                    </div>
+                                    <div class="radio-option">
+                                        <input type="radio" id="weather_cloudy" name="weather" value="cloudy" class="radio-input" onchange="updateProgress()">
+                                        <label for="weather_cloudy" class="radio-label">Cloudy</label>
+                                    </div>
+                                    <div class="radio-option">
+                                        <input type="radio" id="weather_rainy" name="weather" value="rainy" class="radio-input" onchange="updateProgress()">
+                                        <label for="weather_rainy" class="radio-label">Rainy</label>
+                                    </div>
+                                    <div class="radio-option">
+                                        <input type="radio" id="weather_foggy" name="weather" value="foggy" class="radio-input" onchange="updateProgress()">
+                                        <label for="weather_foggy" class="radio-label">Foggy</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Environmental Factors</label>
+                                <div class="checkbox-group">
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" id="vegetation" name="env_factors" value="vegetation">
+                                        <label for="vegetation">Excessive vegetation growth</label>
+                                    </div>
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" id="water_damage" name="env_factors" value="water">
+                                        <label for="water_damage">Water damage/staining</label>
+                                    </div>
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" id="erosion" name="env_factors" value="erosion">
+                                        <label for="erosion">Soil erosion near foundations</label>
+                                    </div>
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" id="debris" name="env_factors" value="debris">
+                                        <label for="debris">Debris accumulation</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Overall Bridge Health Score <span class="required">*</span></label>
+                                <div class="radio-group">
+                                    <div class="radio-option">
+                                        <input type="radio" id="health_excellent" name="health_score" value="excellent" class="radio-input" onchange="updateProgress()">
+                                        <label for="health_excellent" class="radio-label">
+                                            Excellent
+                                            <span class="radio-score">90-100%</span>
+                                        </label>
+                                    </div>
+                                    <div class="radio-option">
+                                        <input type="radio" id="health_good" name="health_score" value="good" class="radio-input" onchange="updateProgress()">
+                                        <label for="health_good" class="radio-label">
+                                            Good
+                                            <span class="radio-score">75-89%</span>
+                                        </label>
+                                    </div>
+                                    <div class="radio-option">
+                                        <input type="radio" id="health_fair" name="health_score" value="fair" class="radio-input" onchange="updateProgress()">
+                                        <label for="health_fair" class="radio-label">
+                                            Fair
+                                            <span class="radio-score">60-74%</span>
+                                        </label>
+                                    </div>
+                                    <div class="radio-option">
+                                        <input type="radio" id="health_poor" name="health_score" value="poor" class="radio-input" onchange="updateProgress()">
+                                        <label for="health_poor" class="radio-label">
+                                            Poor
+                                            <span class="radio-score">40-59%</span>
+                                        </label>
+                                    </div>
+                                    <div class="radio-option">
+                                        <input type="radio" id="health_critical" name="health_score" value="critical" class="radio-input" onchange="updateProgress()">
+                                        <label for="health_critical" class="radio-label">
+                                            Critical
+                                            <span class="radio-score">&lt;40%</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Immediate Action Required <span class="required">*</span></label>
+                                <div class="radio-group">
+                                    <div class="radio-option">
+                                        <input type="radio" id="action_none" name="action_required" value="none" class="radio-input" onchange="updateProgress()">
+                                        <label for="action_none" class="radio-label">No Action</label>
+                                    </div>
+                                    <div class="radio-option">
+                                        <input type="radio" id="action_monitor" name="action_required" value="monitor" class="radio-input" onchange="updateProgress()">
+                                        <label for="action_monitor" class="radio-label">Monitor</label>
+                                    </div>
+                                    <div class="radio-option">
+                                        <input type="radio" id="action_repair" name="action_required" value="repair" class="radio-input" onchange="updateProgress()">
+                                        <label for="action_repair" class="radio-label">Repair</label>
+                                    </div>
+                                    <div class="radio-option">
+                                        <input type="radio" id="action_urgent" name="action_required" value="urgent" class="radio-input" onchange="updateProgress()">
+                                        <label for="action_urgent" class="radio-label">Urgent</label>
+                                    </div>
+                                    <div class="radio-option">
+                                        <input type="radio" id="action_close" name="action_required" value="close" class="radio-input" onchange="updateProgress()">
+                                        <label for="action_close" class="radio-label">Close Bridge</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Summary & Recommendations <span class="required">*</span></label>
+                                <textarea class="form-input" placeholder="Provide overall assessment and recommendations..." onchange="updateProgress()"></textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Inspector Signature <span class="required">*</span></label>
+                                <canvas class="signature-pad" id="signaturePad" width="350" height="150"></canvas>
+                                <div class="signature-actions">
+                                    <button class="btn btn-secondary" onclick="clearSignature()">Clear</button>
+                                    <span style="flex: 1; text-align: center; font-size: 13px; color: #64748b;">Sign above to certify inspection</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Submit Section -->
+                        <div class="submit-section">
+                            <h3 style="font-size: 16px; margin-bottom: 16px;">Submission Checklist</h3>
+                            <div class="submit-checklist">
+                                <div class="checklist-item">
+                                    <div class="checklist-icon" id="check-structural">✓</div>
+                                    <span>Structural assessment completed</span>
+                                </div>
+                                <div class="checklist-item">
+                                    <div class="checklist-icon" id="check-safety">✓</div>
+                                    <span>Safety features evaluated</span>
+                                </div>
+                                <div class="checklist-item">
+                                    <div class="checklist-icon" id="check-surface">✓</div>
+                                    <span>Surface condition assessed</span>
+                                </div>
+                                <div class="checklist-item">
+                                    <div class="checklist-icon" id="check-photos">✓</div>
+                                    <span>Required photos captured (11/11)</span>
+                                </div>
+                                <div class="checklist-item">
+                                    <div class="checklist-icon" id="check-signature">✓</div>
+                                    <span>Digital signature provided</span>
+                                </div>
+                            </div>
+                            <button class="btn btn-success" style="width: 100%; padding: 16px; font-size: 16px; margin-top: 20px;" onclick="submitSurvey()" disabled id="submitBtn">
+                                📤 Submit Inspection Report
+                            </button>
+                            <p style="text-align: center; margin-top: 12px; font-size: 13px; color: #64748b;">
+                                GPS location and timestamp will be recorded
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- History View -->
+                <div class="view" id="history">
+                    <div class="filter-pills">
+                        <button class="filter-pill active" onclick="filterHistory('all')">All Reports</button>
+                        <button class="filter-pill" onclick="filterHistory('bridge', 'BRG-001')">This Bridge</button>
+                        <button class="filter-pill" onclick="filterHistory('recent')">Last 30 Days</button>
+                        <button class="filter-pill" onclick="filterHistory('critical')">Critical Only</button>
+                    </div>
+
+                    <div class="history-list">
+                        <div class="history-item">
+                            <div class="history-header">
+                                <div>
+                                    <div class="bridge-name">NH-44 Highway Bridge</div>
+                                    <div class="history-date">Report ID: RPT-0156 • Dec 15, 2024</div>
+                                </div>
+                                <div class="health-indicator health-good"></div>
+                            </div>
+                            <div class="history-details">
+                                <div class="detail-item">
+                                    <div class="detail-label">Health Score</div>
+                                    <div class="detail-value">78% (Good)</div>
+                                </div>
+                                <div class="detail-item">
+                                    <div class="detail-label">Inspector</div>
+                                    <div class="detail-value">Rajesh Kumar</div>
+                                </div>
+                                <div class="detail-item">
+                                    <div class="detail-label">Issues Found</div>
+                                    <div class="detail-value">Minor surface wear</div>
+                                </div>
+                                <div class="detail-item">
+                                    <div class="detail-label">Action Taken</div>
+                                    <div class="detail-value">Routine maintenance</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="history-item">
+                            <div class="history-header">
+                                <div>
+                                    <div class="bridge-name">Express Highway Flyover</div>
+                                    <div class="history-date">Report ID: RPT-0155 • Jan 8, 2025</div>
+                                </div>
+                                <div class="health-indicator health-excellent"></div>
+                            </div>
+                            <div class="history-details">
+                                <div class="detail-item">
+                                    <div class="detail-label">Health Score</div>
+                                    <div class="detail-value">94% (Excellent)</div>
+                                </div>
+                                <div class="detail-item">
+                                    <div class="detail-label">Inspector</div>
+                                    <div class="detail-value">Rajesh Kumar</div>
+                                </div>
+                                <div class="detail-item">
+                                    <div class="detail-label">Issues Found</div>
+                                    <div class="detail-value">None</div>
+                                </div>
+                                <div class="detail-item">
+                                    <div class="detail-label">Action Taken</div>
+                                    <div class="detail-value">No action required</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="history-item">
+                            <div class="history-header">
+                                <div>
+                                    <div class="bridge-name">Rural Access Bridge</div>
+                                    <div class="history-date">Report ID: RPT-0142 • Oct 5, 2024</div>
+                                </div>
+                                <div class="health-indicator health-poor"></div>
+                            </div>
+                            <div class="history-details">
+                                <div class="detail-item">
+                                    <div class="detail-label">Health Score</div>
+                                    <div class="detail-value">42% (Poor)</div>
+                                </div>
+                                <div class="detail-item">
+                                    <div class="detail-label">Inspector</div>
+                                    <div class="detail-value">Anil Kumar</div>
+                                </div>
+                                <div class="detail-item">
+                                    <div class="detail-label">Issues Found</div>
+                                    <div class="detail-value">Structural cracks, drainage</div>
+                                </div>
+                                <div class="detail-item">
+                                    <div class="detail-label">Action Taken</div>
+                                    <div class="detail-value">Major repairs scheduled</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Navigation -->
+            <div class="bottom-nav">
+                <div class="nav-item active" onclick="showView('dashboard')">
+                    <span class="nav-icon">🏠</span>
+                    <span>Dashboard</span>
+                </div>
+                <div class="nav-item" onclick="showView('history')">
+                    <span class="nav-icon">📊</span>
+                    <span>History</span>
+                </div>
+                <div class="nav-item" onclick="showView('profile')">
+                    <span class="nav-icon">👤</span>
+                    <span>Profile</span>
+                </div>
+                <div class="nav-item" onclick="showSettings()">
+                    <span class="nav-icon">⚙️</span>
+                    <span>Settings</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let currentBridge = null;
+        let currentWeek = 0;
+        let capturedImages = {
+            structural: [],
+            safety: [],
+            surface: []
+        };
+        let signatureData = null;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            updateTime();
+            setInterval(updateTime, 60000);
+            initializeSignaturePad();
+        });
+
+        // Update current time
+        function updateTime() {
+            const now = new Date();
+            const hours = now.getHours();
+            const minutes = now.getMinutes();
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            const displayHours = hours % 12 || 12;
+            document.getElementById('currentTime').textContent = 
+                `${displayHours}:${minutes.toString().padStart(2, '0')} ${ampm}`;
+        }
+
+        // Navigation functions
+        function showView(viewName) {
+            document.querySelectorAll('.view').forEach(view => {
+                view.classList.remove('active');
+            });
+            document.getElementById(viewName).classList.add('active');
+
+            // Update navigation
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            event.currentTarget.classList.add('active');
+
+            // Update header
+            updateHeader(viewName);
+        }
+
+        function updateHeader(viewName) {
+            const backBtn = document.getElementById('backBtn');
+            const headerTitle = document.getElementById('headerTitle');
+            const headerSubtitle = document.getElementById('headerSubtitle');
+
+            switch(viewName) {
+                case 'dashboard':
+                    backBtn.classList.remove('visible');
+                    headerTitle.textContent = 'Bridge Safety Officer';
+                    headerSubtitle.textContent = 'State Road Construction Department';
+                    break;
+                case 'survey':
+                    backBtn.classList.add('visible');
+                    headerTitle.textContent = 'Bridge Inspection';
+                    headerSubtitle.textContent = currentBridge || 'Survey Form';
+                    break;
+                case 'history':
+                    backBtn.classList.remove('visible');
+                    headerTitle.textContent = 'Inspection History';
+                    headerSubtitle.textContent = 'Previous Reports';
+                    break;
+            }
+        }
+
+        function goBack() {
+            showView('dashboard');
+        }
+
+        // Week navigation
+        function changeWeek(direction) {
+            currentWeek += direction;
+            const weekStart = new Date();
+            weekStart.setDate(weekStart.getDate() + (currentWeek * 7));
+            const weekEnd = new Date(weekStart);
+            weekEnd.setDate(weekEnd.getDate() + 6);
+
+            const options = { month: 'short', day: 'numeric' };
+            document.getElementById('currentWeek').textContent = 
+                `Week of ${weekStart.toLocaleDateString('en-US', options)}-${weekEnd.toLocaleDateString('en-US', options)}, ${weekEnd.getFullYear()}`;
+        }
+
+        // Bridge selection
+        function selectBridge(bridgeId) {
+            currentBridge = bridgeId;
+            const bridgeData = {
+                'BRG-001': 'NH-44 Highway Bridge',
+                'BRG-002': 'Express Highway Flyover',
+                'BRG-003': 'City Center Flyover',
+                'BRG-004': 'Rural Access Bridge'
+            };
+            document.getElementById('surveyBridgeName').textContent = bridgeData[bridgeId] || 'Unknown Bridge';
+            document.getElementById('surveyBridgeDetails').textContent = `${bridgeId} • Inspection Form`;
+        }
+
+        // Start survey
+        function startSurvey(bridgeId) {
+            selectBridge(bridgeId);
+            showView('survey');
+            resetForm();
+        }
+
+        // Form navigation
+        function showFormSection(section) {
+            // Hide all sections
+            document.querySelectorAll('.form-section').forEach(sec => {
+                sec.classList.remove('active');
+            });
+            document.getElementById(section).classList.add('active');
+
+            // Update tabs
+            document.querySelectorAll('.form-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.getElementById(`tab-${section}`).classList.add('active');
+        }
+
+        // Image capture simulation
+        function captureImage(category) {
+            const imageCount = capturedImages[category].length + 1;
+            const imageName = `IMG_${category}_${imageCount}.jpg`;
+            
+            capturedImages[category].push({
+                name: imageName,
+                timestamp: new Date().toISOString(),
+                gps: "28.6139°N, 77.2090°E"
+            });
+
+            updateImageDisplay(category);
+            updateProgress();
+            
+            // Show feedback
+            const captureArea = event.currentTarget;
+            captureArea.style.background = '#e0f2fe';
+            setTimeout(() => {
+                captureArea.style.background = '#f8f9fa';
+            }, 300);
+
+            // Vibration feedback
+            if (navigator.vibrate) {
+                navigator.vibrate(50);
+            }
+        }
+
+        // Update image display
+        function updateImageDisplay(category) {
+            const container = document.getElementById(`${category}-images`);
+            container.innerHTML = '';
+            
+            capturedImages[category].forEach((image, index) => {
+                const imageDiv = document.createElement('div');
+                imageDiv.className = 'captured-image';
+                imageDiv.innerHTML = `
+                    <div style="font-size: 10px; text-align: center;">
+                        📷 ${image.name}<br>
+                        <small>${new Date(image.timestamp).toLocaleTimeString()}</small>
+                    </div>
+                    <button class="remove-image" onclick="removeImage('${category}', ${index})">×</button>
+                `;
+                container.appendChild(imageDiv);
+            });
+
+            // Update photo requirements
+            const requirements = {
+                structural: 4,
+                safety: 3,
+                surface: 4
+            };
+
+            const icon = document.getElementById(`${category}-photo-icon`);
+            if (icon) {
+                const captured = capturedImages[category].length;
+                const required = requirements[category] || 0;
+                
+                if (captured >= required) {
+                    icon.classList.add('completed');
+                    icon.textContent = '✓';
+                } else {
+                    icon.classList.remove('completed');
+                    icon.textContent = required - captured;
+                }
+            }
+        }
+
+        // Remove image
+        function removeImage(category, index) {
+            capturedImages[category].splice(index, 1);
+            updateImageDisplay(category);
+            updateProgress();
+        }
+
+        // Signature pad
+        function initializeSignaturePad() {
+            const canvas = document.getElementById('signaturePad');
+            if (!canvas) return;
+
+            const ctx = canvas.getContext('2d');
+            let isDrawing = false;
+            let lastX = 0;
+            let lastY = 0;
+
+            function getEventPos(e) {
+                const rect = canvas.getBoundingClientRect();
+                const clientX = e.clientX || (e.touches && e.touches[0].clientX);
+                const clientY = e.clientY || (e.touches && e.touches[0].clientY);
+                return {
+                    x: (clientX - rect.left) * (canvas.width / rect.width),
+                    y: (clientY - rect.top) * (canvas.height / rect.height)
+                };
+            }
+
+            function startDrawing(e) {
+                isDrawing = true;
+                const pos = getEventPos(e);
+                [lastX, lastY] = [pos.x, pos.y];
+                e.preventDefault();
+            }
+
+            function draw(e) {
+                if (!isDrawing) return;
+                
+                const pos = getEventPos(e);
+                ctx.beginPath();
+                ctx.moveTo(lastX, lastY);
+                ctx.lineTo(pos.x, pos.y);
+                ctx.strokeStyle = '#000';
+                ctx.lineWidth = 2;
+                ctx.lineCap = 'round';
+                ctx.stroke();
+                
+                [lastX, lastY] = [pos.x, pos.y];
+                signatureData = canvas.toDataURL();
+                updateProgress();
+                e.preventDefault();
+            }
+
+            function stopDrawing() {
+                isDrawing = false;
+            }
+
+            // Mouse events
+            canvas.addEventListener('mousedown', startDrawing);
+            canvas.addEventListener('mousemove', draw);
+            canvas.addEventListener('mouseup', stopDrawing);
+            canvas.addEventListener('mouseout', stopDrawing);
+
+            // Touch events
+            canvas.addEventListener('touchstart', startDrawing);
+            canvas.addEventListener('touchmove', draw);
+            canvas.addEventListener('touchend', stopDrawing);
+        }
+
+        // Clear signature
+        function clearSignature() {
+            const canvas = document.getElementById('signaturePad');
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            signatureData = null;
+            updateProgress();
+        }
+
+        // Update form progress
+        function updateProgress() {
+            const requiredFields = {
+                structural: ['structural_condition'],
+                safety: ['guard_rails'],
+                surface: ['surface_condition'],
+                environment: ['weather', 'health_score', 'action_required']
+            };
+
+            let totalRequired = 0;
+            let totalCompleted = 0;
+
+            // Check form fields
+            Object.keys(requiredFields).forEach(section => {
+                requiredFields[section].forEach(field => {
+                    totalRequired++;
+                    if (document.querySelector(`[name="${field}"]:checked`)) {
+                        totalCompleted++;
+                    }
+                });
+            });
+
+            // Check photos
+            const photoRequirements = {
+                structural: 4,
+                safety: 3,
+                surface: 4
+            };
+
+            Object.keys(photoRequirements).forEach(category => {
+                totalRequired += photoRequirements[category];
+                totalCompleted += Math.min(capturedImages[category].length, photoRequirements[category]);
+            });
+
+            // Check signature
+            totalRequired++;
+            if (signatureData) totalCompleted++;
+
+            // Check summary
+            totalRequired++;
+            const summary = document.querySelector('textarea[placeholder*="recommendations"]');
+            if (summary && summary.value.trim()) totalCompleted++;
+
+            // Update progress bar
+            const progress = (totalCompleted / totalRequired) * 100;
+            document.getElementById('formProgress').style.width = progress + '%';
+
+            // Update checklist
+            updateChecklist();
+
+            // Enable/disable submit button
+            const submitBtn = document.getElementById('submitBtn');
+            if (progress >= 100) {
+                submitBtn.disabled = false;
+            } else {
+                submitBtn.disabled = true;
+            }
+        }
+
+        // Update checklist
+        function updateChecklist() {
+            const checks = {
+                'check-structural': document.querySelector('[name="structural_condition"]:checked') !== null,
+                'check-safety': document.querySelector('[name="guard_rails"]:checked') !== null,
+                'check-surface': document.querySelector('[name="surface_condition"]:checked') !== null,
+                'check-photos': capturedImages.structural.length >= 4 && 
+                               capturedImages.safety.length >= 3 && 
+                               capturedImages.surface.length >= 4,
+                'check-signature': signatureData !== null
+            };
+
+            Object.keys(checks).forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    if (checks[id]) {
+                        element.classList.add('completed');
+                        element.textContent = '✓';
+                    } else {
+                        element.classList.remove('completed');
+                        element.textContent = '';
+                    }
+                }
+            });
+        }
+
+        // Submit survey
+        function submitSurvey() {
+            const btn = event.currentTarget;
+            btn.disabled = true;
+            btn.innerHTML = '⏳ Submitting...';
+
+            // Simulate submission
+            setTimeout(() => {
+                btn.innerHTML = '✅ Submitted Successfully!';
+                btn.style.background = 'linear-gradient(135deg, #22c55e, #16a34a)';
+
+                setTimeout(() => {
+                    alert(`Inspection Report Submitted!
+
+Report ID: RPT-${Date.now().toString().slice(-4)}
+Bridge: ${currentBridge}
+Inspector: Rajesh Kumar
+Time: ${new Date().toLocaleString()}
+
+The report has been submitted to the admin system for review.`);
+                    
+                    showView('dashboard');
+                }, 1500);
+            }, 2000);
+        }
+
+        // View history
+        function viewHistory(bridgeId) {
+            showView('history');
+            if (bridgeId) {
+                filterHistory('bridge', bridgeId);
+            }
+        }
+
+        // Filter history
+        function filterHistory(type, value) {
+            // Update active pill
+            document.querySelectorAll('.filter-pill').forEach(pill => {
+                pill.classList.remove('active');
+            });
+            event.currentTarget.classList.add('active');
+
+            // Filter logic would go here
+            console.log(`Filtering by ${type}: ${value}`);
+        }
+
+        // Filter assignments
+        function filterAssignments(status) {
+            console.log(`Filtering assignments by status: ${status}`);
+        }
+
+        // Show settings
+        function showSettings() {
+            alert('Settings page would open here with options for:\n\n• Profile management\n• App preferences\n• Offline data sync\n• Notification settings\n• About & Help');
+        }
+
+        // Reset form
+        function resetForm() {
+            document.querySelectorAll('input[type="radio"], input[type="checkbox"]').forEach(input => {
+                input.checked = false;
+            });
+            document.querySelectorAll('textarea').forEach(textarea => {
+                textarea.value = '';
+            });
+            capturedImages = {
+                structural: [],
+                safety: [],
+                surface: []
+            };
+            signatureData = null;
+            clearSignature();
+            updateProgress();
+            showFormSection('structural');
+        }
+
+        // Add touch feedback
+        document.addEventListener('touchstart', function(e) {
+            if (e.target.matches('.btn, .assignment-card, .radio-label, .checkbox-item, .image-capture-area')) {
+                e.target.style.opacity = '0.7';
+            }
+        });
+
+        document.addEventListener('touchend', function(e) {
+            if (e.target.matches('.btn, .assignment-card, .radio-label, .checkbox-item, .image-capture-area')) {
+                e.target.style.opacity = '1';
+            }
+        });
+
+        // Prevent scrolling on signature pad
+        document.getElementById('signaturePad')?.addEventListener('touchmove', function(e) {
+            e.preventDefault();
+        });
+    </script>
+</body>
+</html>
